@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Responsive Image Placeholder</title>
+
+  <!-- Basic styles to center the page and make the image responsive -->
+  <style>
+    :root{
+      --max-width: 1100px;
+      --gutter: 1.25rem;
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --radius: 12px;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", Arial;
+      background: linear-gradient(180deg,var(--bg),#eef1f6 60%);
+      color:#111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .wrap{
+      max-width:var(--max-width);
+      margin:4vh auto;
+      padding:calc(var(--gutter) + 8px);
+      box-sizing:border-box;
+    }
+
+    .card{
+      background:var(--card);
+      padding:1.25rem;
+      border-radius:var(--radius);
+      box-shadow: 0 8px 24px rgba(16,24,40,0.06);
+      display:grid;
+      gap:1rem;
+      align-items:start;
+    }
+
+    h1{
+      margin:0;
+      font-size:1.25rem;
+      letter-spacing:-0.02em;
+    }
+
+    p.lead{
+      margin:0;
+      color:var(--muted);
+      font-size:0.95rem;
+    }
+
+    /* Responsive image container preserving aspect ratio */
+    .image-figure{
+      margin:0;
+      display:block;
+      width:100%;
+      border-radius:10px;
+      overflow:hidden;
+      background:linear-gradient(90deg,#eceff5,#f8f9fc);
+      border:1px solid rgba(16,24,40,0.03);
+      /* Default aspect ratio: 16 / 9. Adjust with CSS or inline style if needed. */
+      aspect-ratio: 16 / 9;
+    }
+
+    /* Make the actual image cover the container */
+    .image-figure img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover; /* crops nicely while preserving cover */
+      object-position:center;
+      font-family: "object-fit: cover";
+      background:transparent;
+    }
+
+    /* Optional caption styling */
+    figcaption{
+      font-size:0.85rem;
+      color:var(--muted);
+      padding-top:0.5rem;
+    }
+
+    /* small screens: reduce padding */
+    @media (max-width:520px){
+      .wrap{ padding:0.75rem; margin:3vh 0; }
+      .card{ padding:0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main">
+    <article class="card" aria-labelledby="page-title">
+      <header>
+        <h1 id="page-title">Responsive Image Placeholder</h1>
+        <p class="lead">Replace the example `srcset` entries with your image files. The image scales and preserves an aspect ratio.</p>
+      </header>
+
+      <!--
+        Use <picture> + srcset + sizes for responsive delivery.
+        - Replace image-320.jpg / image-640.jpg / image-1280.jpg with your files (or CDN URLs).
+        - Keep the 'sizes' attribute consistent with your layout so the browser picks the best candidate.
+        - The inline data URI is a tiny SVG placeholder used as `src` for very old browsers or while loading.
+      -->
+      <figure class="image-figure" aria-label="Primary responsive image">
+        <picture>
+          <!-- You can include AVIF/WEBP for better compression, and fallback jpg -->
+          <!-- Example: modern AVIF format (replace with real files if you have them) -->
+          <source type="image/avif"
+                  srcset="image-320.avif 320w, image-640.avif 640w, image-1280.avif 1280w"
+                  sizes="(max-width: 640px) 92vw, (max-width: 980px) 80vw, 1100px">
+
+          <!-- Next: WebP -->
+          <source type="image/webp"
+                  srcset="image-320.webp 320w, image-640.webp 640w, image-1280.webp 1280w"
+                  sizes="(max-width: 640px) 92vw, (max-width: 980px) 80vw, 1100px">
+
+          <!-- Fallback: JPEG/PNG -->
+          <img
+            srcset="image-320.jpg 320w, image-640.jpg 640w, image-1280.jpg 1280w"
+            sizes="(max-width: 640px) 92vw, (max-width: 980px) 80vw, 1100px"
+            src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect fill="%23e9eef8" width="100%" height="100%"/><text x="50%" y="50%" font-size="28" font-family="Arial,Helvetica,sans-serif" text-anchor="middle" fill="%239aa3bf" dy=".35em">Placeholder Image — replace srcset URLs</text></svg>'
+            alt="DESCRIBE_THE_IMAGE_HERE"
+            loading="lazy"
+            decoding="async"
+            width="1280" height="720"
+            onerror="this.onerror=null; handleImageError(this);">
+        </picture>
+
+        <figcaption>Tip: replace <code>image-320.jpg</code>, <code>image-640.jpg</code>, and <code>image-1280.jpg</code> with your real assets.</figcaption>
+      </figure>
+    </article>
+  </main>
+
+  <!-- Small JS helper: fallback behavior and accessible update -->
+  <script>
+    /**
+     * handleImageError(img)
+     * Called when image fails to load. Replaces with a neutral SVG data URI and updates caption.
+     */
+    function handleImageError(img) {
+      // If it already failed and was replaced, avoid infinite loop.
+      if (img.dataset.fallbackApplied) return;
+      img.dataset.fallbackApplied = '1';
+
+      // Simple SVG fallback (keeps file self-contained)
+      const svg = encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720">
+          <rect fill="#f3f5f9" width="100%" height="100%"/>
+          <text x="50%" y="50%" font-size="32" font-family="Arial,Helvetica,sans-serif"
+                text-anchor="middle" fill="#99a6bf" dy=".35em">Image failed to load — fallback shown</text>
+        </svg>`
+      );
+
+      img.src = 'data:image/svg+xml;utf8,' + svg;
+
+      // update accessible label / caption for screen readers
+      const fig = img.closest('figure');
+      if (fig) {
+        const cap = fig.querySelector('figcaption');
+        if (cap) cap.textContent = 'Fallback image displayed because the original image failed to load.';
+        img.alt = 'Fallback image: original image failed to load';
+      }
+    }
+
+    // For progressive enhancement: if browser doesn't support aspect-ratio, adjust via JS
+    (function ensureAspectRatioSupport(){
+      // feature detect
+      const supportsAR = CSS && CSS.supports && (CSS.supports('aspect-ratio','16/9') || CSS.supports('aspect-ratio','1 / 1'));
+      if (!supportsAR) {
+        // apply a padding-top trick (16:9)
+        const figures = document.querySelectorAll('.image-figure');
+        figures.forEach(f => {
+          const ratio = 9/16;
+          f.style.position = 'relative';
+          f.style.height = '0';
+          f.style.paddingTop = (ratio * 100) + '%';
+          const img = f.querySelector('img');
+          if (img) {
+            img.style.position = 'absolute';
+            img.style.top = '0';
+            img.style.left = '0';
+            img.style.width = '100%';
+            img.style.height = '100%';
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
